@@ -1,0 +1,124 @@
+21
+Select maker , max(price)as Max_price from pc inner join product on pc.model= product.model  
+group BY maker
+
+22
+SELECT speed , avg(price) as Avg_price
+FROM pc  WHERE speed > 600 group BY speed
+
+23
+SELECT distinct maker 
+FROM pc inner join product on pc.model = product.model  
+WHERE pc.speed >= 750 and maker IN (select  maker  
+FROM laptop inner join product on laptop.model = product.model 
+WHERE laptop.speed >= 750)
+
+24
+SELECT model FROM( 
+SELECT distinct model, price FROM pc WHERE pc.price = (SELECT MAX(price) FROM pc) UNION 
+SELECT distinct model, price FROM laptop WHERE laptop.price = (SELECT MAX(price) FROM laptop)  UNION 
+SELECT distinct model, price FROM printer WHERE printer.price = (SELECT MAX(price) FROM printer)  
+) as t 
+WHERE t.price=(SELECT MAX(price) FROM ( 
+SELECT distinct price FROM laptop WHERE laptop.price = (SELECT MAX(price) FROM laptop)  
+UNION 
+SELECT distinct price FROM pc WHERE pc.price = (SELECT MAX(price) FROM pc)  
+UNION 
+SELECT distinct price FROM printer WHERE printer.price = (SELECT MAX(price) FROM printer)  
+) as t1 )
+
+25
+SELECT distinct product.maker FROM product WHERE product.type='Printer'  
+INTERSECT 
+SELECT distinct product.maker FROM product INNER JOIN pc ON pc.model=product.model  
+WHERE product.type='PC' AND pc.ram=(SELECT MIN(ram) FROM pc)  
+AND pc.speed = (SELECT MAX(speed) FROM (SELECT distinct speed FROM pc 
+WHERE pc.ram=(SELECT MIN(ram) FROM pc)) as t)
+
+26
+SELECT AVG(price)
+FROM ( SELECT code, price, pc.model, ram, hd FROM pc WHERE model IN (
+SELECT model
+FROM product WHERE maker='a')
+UNION
+SELECT code, price, laptop.model, ram, hd FROM laptop WHERE model IN (
+SELECT model FROM product WHERE maker='a') ) a
+
+27
+SELECT maker, AVG(hd)
+FROM product t1 JOIN pc t2 ON t1.model=t2.model WHERE maker IN (
+SELECT maker FROM product WHERE type='printer' )
+GROUP BY maker
+
+28
+select count(*)  from ( select maker from product group by maker having count(model)=1 ) as Q
+
+
+29
+select t.point, t.date, SUM(t.inc), sum(t.out) from( select point, date, inc, null as out from Income_o  
+Union 
+select point, date, null as inc, Outcome_o.out from Outcome_o) as t group by t.point, t.date
+
+30
+select point, date, SUM(sum_out), SUM(sum_inc) 
+from( select point, date, SUM(inc) as sum_inc, null as sum_out from Income Group by point, date  
+Union 
+select point, date, null as sum_inc, SUM(out) as sum_out from Outcome Group by point, date ) as t  
+group by point, date order by point  
+
+
+31
+Select class , country from classes where bore >= 16  
+
+32
+Select country, cast(avg((power(bore,3)/2)) as numeric(6,2)) as weight 
+from (select country, classes.class, bore, name from classes left join ships on classes.class=ships.class  
+union all 
+select distinct country, class, bore, ship from classes t1 left join outcomes t2 on t1.class=t2.ship  
+where ship=class and ship not in (select name from ships) ) a  
+where name!='null' group by country   
+
+
+33
+Select ship from outcomes,battles where result= 'sunk' and battle = 'North Atlantic' group by ship  
+
+34
+Select name from classes,ships where launched >=1922 and displacement>35000 and type='bb' and
+ships.class = classes.class
+
+35
+SELECT model, type
+FROM product
+WHERE upper(model) NOT like '%[^A-Z]%'
+OR model not like '%[^0-9]%'
+
+36
+
+Select name  from ships  where class = name   
+union  
+select ship as name  from classes,outcomes  where classes.class = outcomes.ship  
+
+
+37
+Select class  from(select name,class from ships  
+union  
+select class as name,class  from classes,outcomes  where classes.class=outcomes.ship) A   
+group by class  having count(A.name)=1  
+
+38
+Select distinct country  from classes  where type='bb'   
+intersect  
+Select distinct country  from classes  where type='bc'
+
+39
+
+select distinct ccc.sh from ( select aaa.ship as sh, aaa.[date] as d1, bbb.[date] as d2 from ( 
+select ship, [date] from outcomes as o inner join battles as b on o.battle=b.name where result = 'damaged') as aaa inner join (select ship,  
+[date] from outcomes as o inner join battles as b on o.battle=b.name) as bbb on aaa.ship=bbb.ship 
+where bbb.date > aaa.date) as ccc  
+
+40
+SELECT maker, MAX(type)
+FROM product
+GROUP BY maker
+HAVING COUNT(DISTINCT type) = 1 AND COUNT(model) > 1
