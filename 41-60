@@ -1,0 +1,90 @@
+41
+
+SELECT pro.maker, NULLIF(MAX(COALESCE(pri.price, 922337203685477)), 922337203685477) as price
+FROM product pro INNER JOIN ( SELECT model, price FROM printer UNION ALL 
+SELECT model, price FROM pc UNION ALL 
+SELECT model, price FROM laptop) pri 
+  ON pri.model = pro.model
+GROUP BY pro.maker
+
+42
+Select ship,battle from outcomes where result ='sunk'   
+
+43
+select name from battles where DATEPART(yy, date) not in (select DATEPART(yy, date)  
+from battles join ships on DATEPART(yy, date)=launched) 
+
+44
+Select name from ships where name like 'R%'   
+union   
+Select name from battles where name like 'R%'   
+union   
+Select ship from outcomes where ship like 'R%'  
+
+45
+Select name from ships where name like '% % %'  
+union   
+Select ship from outcomes where ship like '% % %'   
+
+46
+select name as n, displacement as d, numguns as ng from ships inner join classes on ships.class=classes.class where name in
+(select ship from outcomes where battle = 'Guadalcanal')   
+union 
+select ship as n, displacement as d, numguns as ng from outcomes inner join classes on outcomes.ship=classes.class
+where battle = 'Guadalcanal' and ship not in (select name from ships)   
+union  
+select ship as n, null as d, null as ng from outcomes where battle = 'Guadalcanal' and ship not in 
+(select name from ships) and ship not in  (select class from classes)    
+
+47
+
+48
+Select class as n from ships where name in(select ship from outcomes where result='sunk')   
+union  
+Select ship as n from outcomes  
+where ship not in(Select name from ships) and ship in(Select class from classes) and result='sunk'   
+
+49
+select name from ships where class in( Select class from classes where bore=16)   
+union  
+select ship from outcomes where ship in( Select class from classes where bore=16)    
+
+50
+SELECT distinct battle FROM Classes  inner JOIN Ships  ON ships.class = classes.class   
+inner JOIN Outcomes  ON Classes.class=Outcomes.ship or Ships.name=Outcomes.ship   
+WHERE classes.class = 'Kongo'  
+
+51
+select NAME from(select name as NAME, displacement, numguns  
+from ships inner join classes on ships.class = classes.class 
+union 
+select ship as NAME, displacement, numguns from outcomes inner join classes on outcomes.ship= classes.class) as d1 inner join (select displacement, max(numGuns) as numguns from ( select displacement, numguns from ships inner join classes on ships.class = classes.class  
+union 
+select displacement, numguns  from outcomes inner join classes on outcomes.ship= classes.class) as f 
+group by displacement) as d2 on d1.displacement=d2.displacement and d1.numguns =d2.numguns 
+
+52
+Select distinct name from ships  inner join classes cl on ships.class=cl.class 
+where (numGuns>=9 or numguns is NULL) and (bore<19 or bore is NULL) and (displacement<=65000 or displacement is NULL) and type='bb' and country='japan' 
+
+53
+select cast(avg(numguns*1.0) as numeric(4,2)) as Avg_numGuns  from classes where type='bb' 
+
+54
+SELECT CAST(AVG(numguns*1.0) AS NUMERIC (4,2)) as AVG_nmg 
+FROM (SELECT ship, type, numguns   FROM Outcomes LEFT JOIN Classes ON ship = class  
+UNION  
+SELECT name, type, numguns FROM Ships as S INNER JOIN  Classes as C ON c.class = s.class ) AS T 
+WHERE type = 'bb' 
+
+55
+select C.class, min(launched)  from ships as S right join classes as C on s.class=c.class group by C.class 
+
+56
+SELECT c.class, COUNT(s.ship)
+FROM classes c LEFT JOIN ( SELECT o.ship, sh.class
+FROM outcomes o LEFT JOIN ships sh ON sh.name = o.ship
+WHERE o.result = 'sunk') AS s ON s.class = c.class OR s.ship = c.class
+GROUP BY c.class
+
+57
